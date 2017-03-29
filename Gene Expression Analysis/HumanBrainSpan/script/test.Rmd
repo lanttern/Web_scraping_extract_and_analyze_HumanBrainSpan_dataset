@@ -1,0 +1,56 @@
+#### Example code for gene expression analysis by Zhihui Xie
+```{r example code}
+#--------------------------------------------------------------------------------
+#Please load library before analysis
+#--------------------------------------------------------------------------------
+library(rChoiceDialogs)
+library(colorRamps)
+library(devtools)
+library(psych)
+library(coin)
+library(gplots)
+
+#--------------------------------------------------------------------------------
+#Define 3 functions: 1) calculate correlation, 2) creat.heatmap, 3) calculate p value
+#Please run these 3 function before doing mouse or human analysis
+#--------------------------------------------------------------------------------
+
+cal.corr = function(data, index1, index2, method){
+  #
+  cor_matrix_all = cor(t(data[, index1:index2]), method = method);
+  return (cor_matrix_all)
+}
+
+creat.heatmap = function (data, rownames, scale, pwd.image){
+  #rename row names
+  row.names(data) = rownames;
+  #transform data to be matrix
+  datamatrix = data.matrix(data);
+  #setup tiff file
+  tiff(filename = pwd.image, res = 300, height = 10, width = 10, units = "in");
+  #creat expression heatmap
+  heatmap.2(
+    datamatrix, 
+    Rowv=FALSE, 
+    Colv=FALSE,
+    revC = FALSE,
+    scale = scale,
+    col = colorRampPalette(c("blue", "white", "red"))(4000),
+    dendrogram="none",
+    key = TRUE,
+    trace = "none",
+    keysize = 1,
+    density.info="none",
+    key.title = "",
+    key.xlab = "",
+    main = "");
+  dev.off();
+  print ("Heatmap created!")
+}
+
+cal.pvalue = function(data, index){
+  print ("p value of all MET-candidates correlated to MET as against high expressed genes correlated to MET");
+  all_p = wilcox.test(data[2:index], data[index+1:length(data)], correct = TRUE);
+  print (all_p)
+}
+```
